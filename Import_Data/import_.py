@@ -1,4 +1,5 @@
-﻿import psycopg2
+﻿from time import sleep
+import psycopg2
 import ijson
 from  util import DB_CONFIG
 # =====================================================================
@@ -9,13 +10,11 @@ def insert_game(cur, appid, game):
     columns = [
         "appid", "name", "release_date", "estimated_owners", "peak_ccu",
         "required_age", "price", "dlc_count", "detailed_description",
-        "short_description", "supported_languages", "full_audio_languages",
-        "reviews", "header_image", "website", "support_url", "support_email",
+        "short_description","reviews", "header_image", "website", "support_url", "support_email",
         "windows", "mac", "linux", "metacritic_score", "metacritic_url",
         "user_score", "positive", "negative", "score_rank", "achievements",
         "recommendations", "notes", "average_playtime_forever",
-        "average_playtime_2weeks", "median_playtime_forever",
-        "median_playtime_2weeks"
+        "average_playtime_2weeks", "median_playtime_forever","median_playtime_2weeks"
     ]
 
     values = [appid] + [game.get(col) for col in columns[1:]]
@@ -55,13 +54,26 @@ def insert_related(cur, appid, game):
     # DEVELOPERS
     for dev in game.get("developers", []):
         cur.execute(
-            "INSERT INTO developers (developer_name) VALUES (%s) RETURNING id;",
+            """INSERT INTO developers (developer_name) VALUES (%s)
+                ON CONFLICT (developer_name) DO NOTHING 
+                RETURNING id;""",
             (dev,)
         )
-        dev_id = cur.fetchone()[0]
+        try:
+            dev_id = cur.fetchone()[0]
+        except:
+            dev_id = None
+
+        if dev_id is None:
+            cur.execute(
+                "SELECT id FROM developers WHERE developer_name = %s;",
+                (dev,)
+            )
+            dev_id = cur.fetchone()[0]
 
         cur.execute(
-            "INSERT INTO developers_game (id_developer, id_game) VALUES (%s, %s);",
+            """INSERT INTO developers_game (id_developer, id_game) VALUES (%s, %s) 
+                ON CONFLICT DO NOTHING;""",
             (dev_id, appid)
         )
 
@@ -120,18 +132,73 @@ def insert_related(cur, appid, game):
         )
 
     # TAGS
-    for tag in game.get("tags", []):
+    tag_dict = dict(game.get("tags", {}))
+    if(tag_dict):
+        for tag_name, tag_score in tag_dict.items():
+            cur.execute(
+                "INSERT INTO tags (tag_name) VALUES (%s) ON CONFLICT (tag_name) DO NOTHING RETURNING id;",
+                (str(tag_name),)
+            )
+            try:
+                tag_id = cur.fetchone()[0]
+            except:
+                tag_id = None
+
+            if tag_id is None:
+                cur.execute(
+                    "SELECT id FROM tags WHERE tag_name = %s;",
+                    (str(tag_name),)
+                )
+                tag_id = cur.fetchone()[0]
+
+            cur.execute(
+                "INSERT INTO tags_game (id_tag, id_game, tag_score) VALUES (%s, %s, %s);",
+                (tag_id, appid, tag_score)
+            )
+
+    for lang in game.get("supported_languages", []):
         cur.execute(
-            "INSERT INTO tags (tag_value) VALUES (%s) RETURNING id;",
-            (str(tag),)
+            "INSERT INTO languages (language_name) VALUES (%s) ON CONFLICT (language_name) DO NOTHING RETURNING id;",
+            (lang,)
         )
-        tag_id = cur.fetchone()[0]
+        try:
+            lang_id = cur.fetchone()[0]
+        except:
+            lang_id = None
+
+        if lang_id is None:
+            cur.execute(
+                "SELECT id FROM languages WHERE language_name = %s;",
+                (lang,)
+            )
+            lang_id = cur.fetchone()[0]
 
         cur.execute(
-            "INSERT INTO tags_game (id_tag, id_game) VALUES (%s, %s);",
-            (tag_id, appid)
+            "INSERT INTO languages_game (id_language, id_game) VALUES (%s, %s) ON CONFLICT DO NOTHING;",
+            (lang_id, appid)
         )
+    
+    for audio_lang in game.get("full_audio_languages", []):
+        cur.execute(
+            "INSERT INTO audio_languages (audio_language_name) VALUES (%s) ON CONFLICT (audio_language_name) DO NOTHING RETURNING id;",
+            (audio_lang,)
+        )
+        try:
+            audio_id = cur.fetchone()[0]
+        except:
+            audio_id = None
 
+        if audio_id is None:
+            cur.execute(
+                "SELECT id FROM audio_languages WHERE audio_language_name = %s;",
+                (audio_lang,)
+            )
+            audio_id = cur.fetchone()[0]
+
+        cur.execute(
+            "INSERT INTO audio_languages_game (id_audio, id_game) VALUES (%s, %s) ON CONFLICT DO NOTHING;",
+            (audio_id, appid)
+        )
 
 # =====================================================================
 # IMPORT PRINCIPAL
