@@ -83,9 +83,9 @@ Desenvolver o DW usando modelagem dimensional.
 - [x] Escolher o tipo de modelagem (estrela, floco de neve etc.)
 - [x] Criar pelo menos 1 tabela fato
 - [x] Criar pelo menos 3 dimensões
-- [ ] Justificar o DW, explicando:
-  - [ ] Quais perguntas de negócio ele responde
-  - [ ] Qual valor analítico ele gera
+- [x] Justificar o DW, explicando:
+  - [x] Quais perguntas de negócio ele responde
+  - [x] Qual valor analítico ele gera
 
 # 🔄 Entregável 5 — ETL para popular o DW
 
