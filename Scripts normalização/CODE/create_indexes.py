@@ -27,8 +27,6 @@ def create_indexes():
         CREATE INDEX idx_genres_name_lower ON genres (lower(genre_name));
         CREATE INDEX idx_tags_name_lower ON tags (lower(tag_name));
         CREATE INDEX idx_author_name_lower ON author (lower(author_name));
-        CREATE INDEX idx_price_history_id_game ON game_price_history (id_game);
-        CREATE INDEX idx_price_history_date ON game_price_history (changed_at DESC);
         CREATE INDEX idx_language_name_lower ON languages (lower(language_name));
         CREATE INDEX idx_audio_language_name_lower ON audio_languages (lower(audio_language_name));
         """

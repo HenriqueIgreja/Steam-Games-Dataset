@@ -28,6 +28,7 @@ def safe_int_nullable(value):
         return int(float(value))
     except:
         return None
+    
 def insert_enums(cur):
     os_lista = ['windows', 'mac', 'linux']
 
@@ -50,6 +51,14 @@ def insert_game(cur, appid, game):
     data_lancamento = string_to_postgres_date(game.get("release_date", ""))
     
     own_min, own_max = parse_owners(game.get("estimated_owners"))
+
+    pos = safe_int(game.get("positive"), default=0)
+    neg = safe_int(game.get("negative"), default=0)
+    
+    if game.get("user_score") == 0 and (pos + neg) > 0:
+        user_score = (pos / (pos + neg)) * 100
+    else:
+        user_score = safe_int_nullable(game.get("user_score"))
 
     # Montagem do Dicionário com a Lógica de NULL
     clean_data = {
@@ -91,8 +100,8 @@ def insert_game(cur, appid, game):
         # Use safe_int_nullable aqui, pois 0 mudaria a média estatística
         "metacritic_score": safe_int_nullable(game.get("metacritic_score")),
         "score_rank": safe_int_nullable(game.get("score_rank")),
-        "user_score": safe_int_nullable(game.get("user_score")),
-        
+        "user_score": user_score,
+
         # Contadores (0 é ok)
         "recommendations": safe_int(game.get("recommendations"), default=0),
         "achievements": safe_int(game.get("achievements"), default=0),
