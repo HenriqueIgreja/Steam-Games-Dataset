@@ -87,13 +87,15 @@ Clique no nome da DAG e vá para a aba "Graph". Você verá as tarefas sendo exe
 
 ✅ 0.5_criar_database: Cria o banco de dados automaticamente se não existir
 
-✅ 1_infraestrutura_db: Cria/Recria as tabelas (OLTP e OLAP)
+✅ 1_criar_estrutura: Cria/Recria as tabelas (OLTP e OLAP) e os objetos (Automações: triggers, view, etc)
 
-✅ 2_ingestao_json: Popula o banco transacional
+✅ 2_popular_banco: Popula o banco transacional
 
-✅ 3_carga_dw: Carrega o Data Warehouse
+✅ 2.5_criar_índices: Cria os índices para as tabelas OLTP
 
+✅ 3_carregar_dw: Carrega o Data Warehouse
 
+## Outra maneira de rodar (Ainda faltando instruções aqui | Mais manual)
 # Importação dos Dados
 - Instale o Python 3.12+ 
 - Clone o repositório
@@ -104,6 +106,7 @@ Clique no nome da DAG e vá para a aba "Graph". Você verá as tarefas sendo exe
 - Rode o arquivo main.py
 - Espere a importação de todos registros acabarem
 - Pronto!
+- 
 # 📦 Entregável 1 — Dicionário de Dados Inicial (Concluído)
 
 ## Objetivo
