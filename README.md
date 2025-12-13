@@ -95,6 +95,8 @@ Clique no nome da DAG e vá para a aba "Graph". Você verá as tarefas sendo exe
 
 ✅ 3_carregar_dw: Carrega o Data Warehouse
 
+OBS: NÃO ESQUEÇA DE COLOCAR O ARQUIVO .JSON NA PASTA [Scripts_normalizacao](/ETL/airflow_steam/dags/Scripts_normalizacao) que se encontra na pasta ETL.
+
 ## Outra maneira de rodar (Ainda faltando instruções aqui | Mais manual)
 # Importação dos Dados
 - Instale o Python 3.12+ 
